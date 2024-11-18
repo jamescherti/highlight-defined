@@ -81,7 +81,9 @@
 
 (defcustom highlight-defined-face-use-itself
   nil
-  "Non-nil means highlight face name by the face itself instead of `highlight-defined-face-name-face'"
+  "Non-nil to highlight face name by the face itself.
+Non-nil to highlight face name by the face itself instead of
+`highlight-defined-face-name-face'"
   :group 'highlight-defined
   :type 'boolean)
 
@@ -118,7 +120,7 @@ FUNC must not be a symbol."
   (let ((unadvised nil)
         (unaliased func))
     (while (not (eq (setq unadvised (funcall highlight-defined--get-unadvised-def-func unaliased))
-                    (setq unaliased (indirect-function unadvised t)))))
+                    (setq unaliased (indirect-function unadvised)))))
     unaliased))
 
 (defun highlight-defined--determine-face (symbol)
@@ -126,7 +128,7 @@ FUNC must not be a symbol."
 If SYMBOL is not one of the recognized types, return nil."
   (cond
    ((fboundp symbol)
-    (let ((unaliased (indirect-function symbol t)))
+    (let ((unaliased (indirect-function symbol)))
       ;; Check for macros before dealing with advices, because
       ;; `ad-get-orig-definition' strips the macro tag.
       (if (highlight-defined--is-macro-p unaliased)
@@ -149,7 +151,8 @@ If SYMBOL is not one of the recognized types, return nil."
 (defvar highlight-defined--face nil)
 
 (defun highlight-defined--matcher (end)
-  "The matcher function to be used by Font Lock mode."
+  "The matcher function to be used by Font Lock mode.
+The END variable is a buffer position that bounds the search."
   (catch 'highlight-defined--matcher
     (while (re-search-forward "\\_<.+?\\_>" end t)
       (let ((symbol (intern-soft (buffer-substring-no-properties (match-beginning 0) (match-end 0)))))
